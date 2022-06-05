@@ -25,7 +25,7 @@ const Viagem = banco.define('viagem', {
             key: 'id'
         }
     },
-    encerrada: {
+    status: {
         type: DataTypes.STRING,
         defaultValue: '0'
     },

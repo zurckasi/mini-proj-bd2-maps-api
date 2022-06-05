@@ -31,7 +31,9 @@ app.delete('/passageiro', passageiroController.deletaPassageiro)
 
 app.get('/motoristas', motoristaController.getMotoristasPaginado)
 app.get('/motorista', motoristaController.getMotoristaPorEmail)
+app.get('/motorista/viagens', motoristaController.buscarViagensPeloRaio)
 app.post('/motorista', motoristaController.novoMotorista)
+app.post('/iniciar', motoristaController.iniciarViagem)
 app.delete('/motorista', motoristaController.deletaMotorista)
 
 app.get('/viagens', viagemController.getViagensPaginado)
@@ -39,3 +41,4 @@ app.get('/viagem', viagemController.getViagem)
 app.put('/viagem', viagemController.encerrarViagem)
 app.post('/viagem', viagemController.novaViagem)
 app.delete('/viagem', viagemController.deletaViagem)
+
