@@ -1,14 +1,15 @@
 import React from "react";
-//import { useNavigation } from "@react-navigation/native";
 
 import { View, Text } from "react-native";
-//import { TouchableOpacity } from "react-native-gesture-handler";
-
+import { MaterialCommunityIcons } from '@expo/vector-icons';
 //import { Container } from ".styles";
-export default function Driver() {
+export default function Passenger() {
   return (
     <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
-      <Text>pagina Motorista</Text>
+      <Text>pagina Passageiro</Text>
+      <MaterialCommunityIcons name="car-arrow-right" size={24} color="black" />
+
+
     </View>
   );
 }
