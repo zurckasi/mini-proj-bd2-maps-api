@@ -9,7 +9,7 @@ import {
   BackHandler,
   Modal,
 } from "react-native";
-import * as Animatable from "react-native-animatable";
+
 import { useNavigation } from "@react-navigation/native";
 
 import { Container } from "./styles";
@@ -26,15 +26,11 @@ export default function Home() {
 
   return (
     <Container>
-      <Animatable.View
-        animation="fadeInLeft"
-        delay={500}
-        style={styles.containerHeader}
-      >
+      <View style={styles.containerHeader}>
         <Text style={styles.message}>Bem Vinde </Text>
-      </Animatable.View>
+      </View>
 
-      <Animatable.View animation="fadeInUp" style={styles.containerForm}>
+      <View animation="fadeInUp" style={styles.containerForm}>
         <Text style={styles.title}> Nome</Text>
         <TextInput placeholder="Digite seu Nome" style={styles.input} />
 
@@ -47,7 +43,7 @@ export default function Home() {
         >
           <Text style={styles.buttonText}>Acessar</Text>
         </TouchableOpacity>
-      </Animatable.View>
+      </View>
 
       <Modal
         animationType="fade"
