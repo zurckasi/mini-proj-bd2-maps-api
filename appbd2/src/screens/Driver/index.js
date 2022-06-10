@@ -1,18 +1,18 @@
 import React, { useEffect, useState } from "react";
 
-import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
+import { View, Text, StyleSheet, TouchableOpacity, SliderBase } from "react-native";
 import { MaterialIcons } from '@expo/vector-icons';
-import MapView from 'react-native-maps';
+import MapView, { Marker } from 'react-native-maps';
 import * as Location from 'expo-location';
+import { findNearTrips } from '../../api'
 
 export default function Driver() {
-  let [location, setLocation] = useState({
-    latitude: -6.9261399,
-    longitude: -38.5897933,
-    latitudeDelta: 0.14,
-    longitudeDelta: 0.14,
-  }
-  );
+  let [location, setLocation] = useState(null);
+  const [nearTrips, setNearTrips] = useState([])
+  const [latitudeDelta, setLatitudeDelta] = useState(0.001)
+  const [longitudeDelta, setLongitudeDelta] = useState(0.001)
+  const [nearTripsMarkers, setNearTripsMarkers] = useState([])
+
 
   useEffect(() => {
     (async () => {
@@ -22,29 +22,78 @@ export default function Driver() {
         return;
       }
 
-      let location = await Location.getCurrentPositionAsync({});
-      setLocation({
-        latitude: JSON(location.coords.latitude),
-        longitude: JSON(location.coords.longitude),
-        latitudeDelta: 0.14,
-        longitudeDelta: 0.14,
-      });
+      setLocation(await handleInitialRegion())
     })();
 
   }, []);
 
 
+  const handleFindNearTrips = () => {
+    findNearTrips(location, 0.5).then(response => {
+      if (response !== null && response.status === 200) {
+        
+        let maximumLatitude = Number.MIN_SAFE_INTEGER
+        let maximumLongitude = Number.MIN_SAFE_INTEGER
+        
+        const markers = response.data.map(m => {
+          const [longitude, latitude] = m.destino.coordinates
+
+          if(latitude > maximumLatitude){
+            maximumLatitude = latitude
+          }
+          if(longitude > maximumLongitude){
+            maximumLongitude = longitude
+          }
+
+          return { longitude, latitude }
+        })
+
+        
+        setLocation({
+          ...location,
+          latitudeDelta: Math.abs((maximumLatitude  - location.latitude)) * 5,
+          longitudeDelta: Math.abs((maximumLongitude - location.longitude)) * 5
+        })
+        setNearTrips(response.data)
+        setNearTripsMarkers(markers)
+      }
+    }
+    ).catch()
+  }
+
+  const handleInitialRegion = async () => {
+    const { coords } = await Location.getCurrentPositionAsync({});
+    return {
+      latitudeDelta,
+      longitudeDelta,
+      ...coords
+    }
+  }
+
   return (
     <View style={styles.container}>
-
-      <Text>pagina Motorista</Text>
-      <MapView style={styles.map} region={location} showsUserLocation />
-
+      <MapView
+        style={styles.map}
+        region={location}
+        showsUserLocation
+        loadingEnabled
+        mapType="hybrid"
+      >
+        {
+          nearTripsMarkers.length > 0 &&
+          nearTripsMarkers.map(
+            (m, index) => {
+              return <Marker coordinate={m} key={index}/>
+            }
+        )}
+      </MapView>
 
       <TouchableOpacity
         style={styles.button}
+        onPress={() => handleFindNearTrips()}
       >
         <MaterialIcons name="person-search" size={35} color="white" />
+        <Text style={styles.text}>Buscar passageiros</Text>
       </TouchableOpacity>
     </View>
   );
@@ -58,15 +107,20 @@ const styles = StyleSheet.create({
     backgroundColor: "#F1BBF2",
   },
   map: {
-    width: "90%",
-    height: "70%",
-
+    width: "100%",
+    height: "80%",
+    marginBottom: 50
   },
   button: {
     backgroundColor: "#A6038B",
+    alignSelf: "center",
     alignItems: "center",
-    padding: 13,
+    padding: 15,
     marginTop: 2,
     borderRadius: 25,
+  },
+  text: {
+    color: "#FFF",
+    fontWeight: "bold"
   }
 });

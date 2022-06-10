@@ -1,23 +1,22 @@
-import React, { useState, useEffect } from "react";
-
-import { View, StyleSheet, TouchableOpacity, TextInput } from "react-native";
+import React, { useState, useEffect, useContext } from "react";
+import { View, StyleSheet, TouchableOpacity, Text, BackHandler } from "react-native";
 import { MaterialCommunityIcons } from '@expo/vector-icons';
-
-import MapView from 'react-native-maps';
+import MapView, { Marker } from 'react-native-maps';
 import * as Location from 'expo-location';
+import { newTrip, getPassenger } from '../../api'
+import { AuthContext } from '../../contexts/authContext'
 
 
 export default function Passenger() {
 
-  let [location, setLocation] = useState({
-    latitude: -6.9261399,
-    longitude: -38.5897933,
-    latitudeDelta: 0.14,
-    longitudeDelta: 0.14,
-  }
-  );
+  const { user } = useContext(AuthContext)
+  const [destination, setDestination] = useState(null)
+  let [location, setLocation] = useState(null);
 
   useEffect(() => {
+    BackHandler.addEventListener("hardwareBackPress", () => {
+      return true;
+    });
     (async () => {
       let { status } = await Location.requestForegroundPermissionsAsync();
       if (status !== 'granted') {
@@ -25,32 +24,70 @@ export default function Passenger() {
         return;
       }
 
-      let location = await Location.getCurrentPositionAsync({});
-
-
-      setLocation({
-        latitude: JSON(location.coords.latitude),
-        longitude: JSON(location.coords.longitude),
-        latitudeDelta: 0.0922,
-        longitudeDelta: 0.0421,
-      });
+      setLocation(await handleInitialRegion())
     })();
 
   }, []);
+
+  const handleInitialRegion = async () => {
+    const { coords } = await Location.getCurrentPositionAsync({});
+    return {
+      latitudeDelta: 0.003,
+      longitudeDelta: 0.003,
+      ...coords
+    }
+  }
+
+
+  const handleNewTrip = () => {
+    getPassenger(user.mail).then(response => {
+      const [userResponse] = response.data.rows
+
+      if (userResponse.id) {
+        newTrip(userResponse.id, destination).then(({status, data}) => {
+          if(status === 201){
+            alert("Viagem cadastrada!")
+            setDestination(null)
+          }
+          if(status === 400){
+            alert("Você ainda têm uma viagem em aberto")
+          }
+        }).catch(() => {
+          alert("Erro ao cadastrar viagem")
+          setDestination(null)
+        })
+      }
+    }).catch()
+  }
   return (
 
     <View style={styles.container}>
       <View styles={styles.contNav}>
-        <TextInput placeholder="Informe seu Destino..." style={styles.input} />
-
+        <Text style={styles.text} >Toque no mapa para informar um destino</Text>
         <TouchableOpacity
           style={styles.button}
+          disabled={destination === null}
+          onPress={() => handleNewTrip()}
         >
-          <MaterialCommunityIcons name="map-search" size={35} color="white" />
+          <MaterialCommunityIcons name="car" size={35} color="white" />
+          <Text style={styles.buttonText}>Solicitar viagem</Text>
         </TouchableOpacity>
       </View>
 
-      <MapView style={styles.map} region={location} showsUserLocation />
+      <MapView
+        style={styles.map}
+        region={location}
+        showsUserLocation
+        loadingEnabled
+        onPress={e => setDestination(e.nativeEvent.coordinate)}
+        mapType="hybrid"
+      >
+        {
+          destination != null &&
+          <Marker coordinate={destination} />
+        }
+
+      </MapView>
 
     </View>
   );
@@ -64,28 +101,31 @@ const styles = StyleSheet.create({
     backgroundColor: "#F1BBF2",
   },
   map: {
-    width: "90%",
-    height: "70%",
-
+    margin: 0,
+    width: "100%",
+    height: "80%"
   },
   button: {
     backgroundColor: "#A6038B",
     alignItems: "center",
+    alignSelf: "center",
+    color: "#FFF",
+    width: 150,
     padding: 5,
     borderRadius: 25,
-    marginBottom: 12,
-
+    marginBottom: 12
   },
-  bottonText: {
-    color: '#FFF',
-
-
+  buttonText: {
+    color: '#FFF'
   },
-  input: {
-    borderBottomWidth: 1,
-    height: 40,
+  text: {
+    fontWeight: "bold",
+    color: "#FFF",
+    marginTop: 13,
+    textAlign: "center",
+    width: 250,
     marginBottom: 12,
-    fontSize: 16,
+    fontSize: 20,
   },
 
   contNav: {

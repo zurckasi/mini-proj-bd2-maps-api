@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useContext } from "react";
 import { Ionicons, MaterialIcons } from "@expo/vector-icons";
 import {
   View,
@@ -11,31 +11,111 @@ import {
 } from "react-native";
 
 import { useNavigation } from "@react-navigation/native";
-
+import * as Location from 'expo-location';
 import { Container } from "./styles";
+import { AuthContext } from '../../contexts/authContext'
+
+import { createDriver, createPassenger } from '../../api'
 
 export default function Home() {
   const navigation = useNavigation();
   const [modalActive, setModalActive] = useState(false);
+  const [nome, setNome] = useState('')
+  const [email, setEmail] = useState('')
+  const [currentLocation, setCurrentLocation] = useState(null);
+  const [errorMsg, setErrorMsg] = useState(null);
+  const { setUserContext } = useContext(AuthContext)
+
 
   useEffect(() => {
     BackHandler.addEventListener("hardwareBackPress", () => {
       return true;
     });
+    (async () => await handleLocation())()
+
+
   }, []);
+
+  const handleCreateDriver = async () => {
+
+    setErrorMsg(null)
+    
+    if(!nome && !email){
+      setErrorMsg("Nome e e-mail são obrigatórios")
+      setModalActive(false)
+      return
+    }
+
+    setUserContext(nome, email)
+
+    createDriver(nome, email, currentLocation.coords)
+      .then(response => {
+        if (response !== null && response.status === 201) {
+          navigation.navigate("Driver")
+        }
+        else {
+          setErrorMsg("Erro ao cadastrar motorista")
+        }
+      })
+      .catch(() => setErrorMsg("Erro ao cadastrar motorista"))
+
+    setNome("")
+    setEmail("")
+    setModalActive(false)
+  }
+
+  const handleCreatePassenger = function () {
+    setErrorMsg(null)
+    
+    if(!nome && !email){
+      setErrorMsg("Nome e e-mail são obrigatórios")
+      setModalActive(false)
+      return
+    }
+
+    setUserContext(nome, email)
+
+    createPassenger(nome, email, currentLocation.coords)
+      .then(response => {
+        if (response !== null && response.status === 201) {
+          navigation.setParams(currentLocation)
+          navigation.navigate("Passenger")
+        }
+        else {
+          setErrorMsg("Erro ao cadastrar passageiro")
+        }
+      })
+      .catch(() => setErrorMsg("Erro ao cadastrar passageiro"))
+
+    setNome("")
+    setEmail("")
+    setModalActive(false)
+  }
+
+  const handleLocation = async () => {
+    setErrorMsg(null)
+    let { status } = await Location.requestForegroundPermissionsAsync();
+    if (status !== 'granted') {
+      setErrorMsg('A aplicação necessita do acesso a localização');
+      return;
+    }
+
+    let location = await Location.getCurrentPositionAsync({});
+    setCurrentLocation(location);
+  }
 
   return (
     <Container>
       <View style={styles.containerHeader}>
-        <Text style={styles.message}>Bem Vinde </Text>
+        <Text style={styles.message}>Bem Vindo</Text>
       </View>
 
       <View animation="fadeInUp" style={styles.containerForm}>
         <Text style={styles.title}> Nome</Text>
-        <TextInput placeholder="Digite seu Nome" style={styles.input} />
+        <TextInput placeholder="Digite seu Nome" style={styles.input} value={nome} onChangeText={(input) => setNome(input)} />
 
         <Text style={styles.title}> Email</Text>
-        <TextInput placeholder="Digite seu Email" style={styles.input} />
+        <TextInput placeholder="Digite seu Email" style={styles.input} value={email} onChangeText={(input) => setEmail(input)} />
 
         <TouchableOpacity
           style={styles.button}
@@ -56,17 +136,36 @@ export default function Home() {
             <Text style={styles.titleModal}> Escolha seu Perfil:</Text>
             <TouchableOpacity
               style={styles.buttonModal}
-              onPress={() => navigation.navigate("Driver")}
+              onPress={() => handleCreateDriver()}
             >
               <Text style={styles.buttonText}> Motorista</Text>
               <Ionicons name="car-sport" size={35} color="#fff" />
             </TouchableOpacity>
             <TouchableOpacity
               style={styles.buttonModal}
-              onPress={() => navigation.navigate("Passenger")}
+              onPress={() => handleCreatePassenger()}
             >
               <Text style={styles.buttonText}> Passageiro</Text>
               <MaterialIcons name="directions-walk" size={36} color="#fff" />
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
+
+      <Modal
+        animationType="fade"
+        transparent={true}
+        visible={errorMsg !== null}
+        onRequestClose={async () => await handleLocation()}
+      >
+        <View style={styles.outerView}>
+          <View style={styles.modalView}>
+            <Text style={styles.titleModal}>{errorMsg}</Text>
+            <TouchableOpacity
+              style={styles.buttonModal}
+              onPress={async () => await handleLocation()}
+            >
+              <Text style={styles.buttonText}>Ok</Text>
             </TouchableOpacity>
           </View>
         </View>

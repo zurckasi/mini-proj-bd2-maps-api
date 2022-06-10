@@ -18,16 +18,12 @@ export default function AppRoutes() {
     return (
 
         <NavigationContainer>
-
             <Stack.Navigator >
                 <Stack.Screen options={{ headerShown: false }} name="Splash" component={Splash} />
                 <Stack.Screen options={{ headerShown: false }} name="Home" component={Home} />
-                <Stack.Screen options={{ headerShown: false }} name="Driver" component={Driver} />
-                <Stack.Screen options={{ headerShown: false }} name="Passenger" component={Passenger} />
-
-
+                <Stack.Screen options={{ headerTitle: "Motorista" }} name="Driver" component={Driver} />
+                <Stack.Screen options={{ headerTitle: "Passageiro" }} name="Passenger" component={Passenger} />
             </Stack.Navigator>
-
         </NavigationContainer>
     )
 }
