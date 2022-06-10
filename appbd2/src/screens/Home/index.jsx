@@ -47,6 +47,11 @@ export default function Home() {
     }
 
     setUserContext(nome, email)
+    
+    if(currentLocation === null){
+      setErrorMsg("Não foi possivel acessar a localização do dispositivo")
+      return
+    }
 
     createDriver(nome, email, currentLocation.coords)
       .then(response => {
@@ -74,6 +79,12 @@ export default function Home() {
     }
 
     setUserContext(nome, email)
+    console.log(currentLocation)
+
+    if(currentLocation === null){
+      setErrorMsg("Não foi possivel acessar a localização do dispositivo")
+      return
+    }
 
     createPassenger(nome, email, currentLocation.coords)
       .then(response => {

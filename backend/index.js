@@ -25,13 +25,13 @@ app.use(bodyParser.json())
 
 //endpoints
 app.get('/passageiros', passageiroController.getPassageirosPaginado)
-app.get('/passageiro', passageiroController.getPassageiroPorEmail)
+app.post('/passageiro/busca', passageiroController.getPassageiroPorEmail)
 app.post('/passageiro', passageiroController.novoPassageiro)
 app.delete('/passageiro', passageiroController.deletaPassageiro)
 
 app.get('/motoristas', motoristaController.getMotoristasPaginado)
-app.get('/motorista', motoristaController.getMotoristaPorEmail)
-app.get('/motorista/viagens', motoristaController.buscarViagensPeloRaio)
+app.post('/motorista/busca', motoristaController.getMotoristaPorEmail)
+app.post('/motorista/viagens', motoristaController.buscarViagensPeloRaio)
 app.post('/motorista', motoristaController.novoMotorista)
 app.post('/iniciar', motoristaController.iniciarViagem)
 app.delete('/motorista', motoristaController.deletaMotorista)
