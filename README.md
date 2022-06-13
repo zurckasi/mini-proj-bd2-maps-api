@@ -1,6 +1,14 @@
 # Mini projeto de Banco de Dados 
 Aplicativo desenvolvido para a disciplina de banco de dados 2 do curso de ADS no IFPB, realiza a localização e conexão entre motoristas e passageiros.
 
+<div align="center" style="margin: 0 auto; display: flex;  justify-content: space-around; flex-wrap: wrap; width: 700px;">
+        <img height="250 px" src="./assets/screen_01.jpg">
+        <img height="250 px" src="./assets/screen_02.jpg">
+        <img height="250 px" src="./assets/screen_03.jpg">
+        <img height="250 px" src="./assets/screen_04.jpg">
+        <img height="250 px" src="./assets/screen_05.jpg">
+</div>
+
 ## Pré-requisitos
 
 :warning: [Node](https://nodejs.org/en/download/)
