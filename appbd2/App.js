@@ -12,6 +12,8 @@ export default function App() {
   LogBox.ignoreLogs([
     "ViewPropTypes will be removed",
     "ColorPropType will be removed",
+    "Remote debugger is in a background tab which may cause apps to perform slowly",
+
   ])
 
   return (
