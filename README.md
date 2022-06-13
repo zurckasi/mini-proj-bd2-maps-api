@@ -55,9 +55,8 @@ Abra o aplicativo Expo Go no celular e leia o QRcode que aparecerá no navegador
 
 ...
 
-## Desenvolvedores/Contribuintes :octocat:
+## Desenvolvedores :octocat:
 
-Liste o time responsável pelo desenvolvimento do projeto
 
 | [<img src="https://avatars.githubusercontent.com/u/85362991?v=4" width=115><br><sub>Isak Furtado</sub>](https://github.com/zurckasi) |  [<img src="https://avatars.githubusercontent.com/u/64111135?v=4" width=115><br><sub>Ewerton Maciel</sub>](https://github.com/ewertonmac) |  [<img src="https://avatars.githubusercontent.com/u/60322853?v=4" width=115><br><sub>Rebehk Jordão</sub>](https://github.com/Rebehk) |
 | :---: | :---: | :---: 
